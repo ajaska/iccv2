@@ -32,6 +32,11 @@ def select_properties(media):
     )
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return redirect(url_for('static', filename='favicon.ico'))
+
+
 @app.route('/')
 def index():
     access_token = session.get('access_token')
