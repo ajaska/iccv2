@@ -16,27 +16,11 @@ app = Flask(__name__)
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-app.secret_key = config['Server']['SecretKey']
-
 ig_client_id = config['Instagram']['ClientId']
 ig_client_secret = config['Instagram']['ClientSecret']
+
 redirect_uri = config['Server']['BaseUri'] + '/auth'
-
-ice_cream_words = ["ice cream", "cream", "icc", "icecream", "Hall"]
-
-
-def contains_ice_cream(media):
-    caption = media.get("caption", {}).get("text")
-    for word in ice_cream_words:
-        if word in caption:
-            return True
-        for tag in media.get("tags"):
-            if word in tag:
-                return True
-        if word in media.get("location", {}).get("name"):
-            return True
-    return False
-
+app.secret_key = config['Server']['SecretKey']
 
 Image = namedtuple('Image', ['location', 'image'])
 
@@ -55,20 +39,21 @@ def index():
         return render_template('index.html')
     payload = {'access_token': access_token}
     r = requests.get(
-        "https://api.instagram.com/v1/users/self/media/recent",
+        "https://api.instagram.com/v1/tags/icecreamcollective/media/recent",
         params=payload
     )
     data = r.json().get("data")
-    if not data:
+    if data is None:
         return "Error: " + r.text
+    elif not data:
+        return "Error: found no ice cream images :(", 500
 
     data = filter(lambda media: media.get('location') is not None, data)
     data = filter(lambda media: media.get('type') == 'image', data)
-    data = filter(contains_ice_cream, data)
     data = map(select_properties, data)
     data = list(data)
     if not data:
-        return "Error: no ice cream :("
+        return "Error: no ice cream :(", 404
     return render_template(
         'map.html',
         gmaps_api_key=config['Google Maps']['ApiKey'],
@@ -82,6 +67,7 @@ def oauth_redirect():
         'https://api.instagram.com/oauth/authorize/?'
         'client_id={}&'
         'redirect_uri={}&'
+        'scope=basic+public_content&'
         'response_type=code'
     ).format(ig_client_id, redirect_uri)
     return redirect(redirect_url, code=302)
