@@ -20,7 +20,7 @@ app.secret_key = config['Server']['SecretKey']
 
 ig_client_id = config['Instagram']['ClientId']
 ig_client_secret = config['Instagram']['ClientSecret']
-redirect_uri = 'http://' + config['Server']['Hostname'] + '/auth'
+redirect_uri = config['Server']['BaseUri'] + '/auth'
 
 ice_cream_words = ["ice cream", "cream", "icc", "icecream", "Hall"]
 

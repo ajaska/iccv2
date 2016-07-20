@@ -3,7 +3,7 @@ ClientId = asdf1234
 ClientSecret = asdf1234
 
 [Server]
-Hostname = yourserver.com:1234
+BaseUri = https://yourserver.com:1234
 SecretKey = asds1234
 
 [Google Maps]
