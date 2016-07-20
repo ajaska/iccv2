@@ -63,8 +63,11 @@ def index():
         data = list(data)
         if not data:
             return "Error: no ice cream :("
-        print(data)
-        return str(data)
+        return render_template(
+            'map.html',
+            gmaps_api_key=config['Google Maps']['ApiKey'],
+            images=data
+        )
 
 
     return render_template('index.html')
