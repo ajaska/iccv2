@@ -23,6 +23,8 @@ ig_client_secret = config['Instagram']['ClientSecret']
 redirect_uri = 'http://' + config['Server']['Hostname'] + '/auth'
 
 ice_cream_words = ["ice cream", "cream", "icc", "icecream", "Hall"]
+
+
 def contains_ice_cream(media):
     caption = media.get("caption", {}).get("text")
     for word in ice_cream_words:
@@ -35,7 +37,10 @@ def contains_ice_cream(media):
             return True
     return False
 
+
 Image = namedtuple('Image', ['location', 'image'])
+
+
 def select_properties(media):
     return Image(
         media['location'],
@@ -46,31 +51,30 @@ def select_properties(media):
 @app.route('/')
 def index():
     access_token = session.get('access_token')
-    if access_token:
-        payload = {'access_token': access_token}
-        r = requests.get(
-            "https://api.instagram.com/v1/users/self/media/recent",
-            params=payload
-        )
-        data = r.json().get("data")
-        if not data:
-            return "Error: " + r.text
+    if not access_token:
+        return render_template('index.html')
+    payload = {'access_token': access_token}
+    r = requests.get(
+        "https://api.instagram.com/v1/users/self/media/recent",
+        params=payload
+    )
+    data = r.json().get("data")
+    if not data:
+        return "Error: " + r.text
 
-        data = filter(lambda media: media.get('location') is not None, data)
-        data = filter(lambda media: media.get('type') == 'image', data)
-        data = filter(contains_ice_cream, data)
-        data = map(select_properties, data)
-        data = list(data)
-        if not data:
-            return "Error: no ice cream :("
-        return render_template(
-            'map.html',
-            gmaps_api_key=config['Google Maps']['ApiKey'],
-            images=data
-        )
+    data = filter(lambda media: media.get('location') is not None, data)
+    data = filter(lambda media: media.get('type') == 'image', data)
+    data = filter(contains_ice_cream, data)
+    data = map(select_properties, data)
+    data = list(data)
+    if not data:
+        return "Error: no ice cream :("
+    return render_template(
+        'map.html',
+        gmaps_api_key=config['Google Maps']['ApiKey'],
+        images=data
+    )
 
-
-    return render_template('index.html')
 
 @app.route('/auth-redirect')
 def oauth_redirect():
@@ -81,6 +85,7 @@ def oauth_redirect():
         'response_type=code'
     ).format(ig_client_id, redirect_uri)
     return redirect(redirect_url, code=302)
+
 
 @app.route('/auth')
 def oauth_callback():
