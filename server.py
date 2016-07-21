@@ -22,14 +22,25 @@ ig_client_secret = config['Instagram']['ClientSecret']
 redirect_uri = config['Server']['BaseUri'] + '/auth'
 app.secret_key = config['Server']['SecretKey']
 
-Image = namedtuple('Image', ['location', 'image'])
+Image = namedtuple('Image', ['location', 'image', 'width', 'height', 'text'])
 
 
 def select_properties(media):
     return Image(
         media['location'],
-        media['images']['standard_resolution']['url']
+        media['images']['standard_resolution']['url'],
+        media['images']['standard_resolution']['width'],
+        media['images']['standard_resolution']['height'],
+        media['caption'].get('text', '').split("\n")[0]
     )
+
+
+# It's no good if images are directly on top of each other
+def fudge_locations(media):
+    fudge_factor = (hash(media['id']) % 200 - 100) / 40000
+    media['location']['longitude'] += fudge_factor
+    media['location']['latitude'] += fudge_factor
+    return media
 
 
 @app.route('/favicon.ico')
@@ -61,6 +72,7 @@ def index():
 
     data = filter(lambda media: media.get('location') is not None, data)
     data = filter(lambda media: media.get('type') == 'image', data)
+    data = map(fudge_locations, data)
     data = map(select_properties, data)
     data = list(data)
     if not data:

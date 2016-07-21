@@ -5,6 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='markerclusterer.js') }}"></script>
     <style>
       html, body {
         height: 100%;
@@ -31,7 +32,10 @@
             {
                 lat: {{image.location.latitude}},
                 lng: {{image.location.longitude}},
+                width: {{image.width}},
+                height: {{image.height}},
                 url: "{{image.image}}",
+                text: "{{image.text}}",
             },
         {% endfor %}
         ];
@@ -39,10 +43,16 @@
         var bounds = new google.maps.LatLngBounds();
         var infowindow = new google.maps.InfoWindow();    
 
+        var markers = [];
         for (i = 0; i < locations.length; i++) {  
+          var ratio = locations[i].width/locations[i].height;
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
-            map: map
+            // map: map,
+            icon: {
+                url: locations[i].url,
+                scaledSize: new google.maps.Size(100*ratio, 100),
+            }
           });
 
           //extend the bounds to include each marker's position
@@ -50,13 +60,17 @@
 
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
-              infowindow.setContent('<img border="0" width="100" height="100" src ="'+locations[i].url+'">');
+              infowindow.setContent('<div><img border="0" width="400" height="400" src ="'+locations[i].url+'"></div><p>'+locations[i].text+'</p>');
               infowindow.open(map, marker);
             }
           })(marker, i));
+
+          markers.push(marker);
         }
         //now fit the map to the newly inclusive bounds
         map.fitBounds(bounds);
+
+        var markerCluster = new MarkerClusterer(map, markers);
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{gmaps_api_key}}&callback=initMap"
