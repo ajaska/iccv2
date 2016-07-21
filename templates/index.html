@@ -1,8 +1,43 @@
 <!doctype html>
-<title>Login to instagram</title>
+<head>
+    <title>Login to instagram</title>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
 <body>
-    <div>
-        Pls <a href="/auth-redirect">click here</a> to connect with instagram
+    <div class="content">
+        <div class="login-box valign-wrapper">
+            <div class="valign center-align content-stuff">
+                <img width="256" height="256" src="{{ url_for('static', filename='ice-cream.png') }}" />
+                <h1>This is the #IceCreamCollective</h1>
+                <h6 class="pls-respond">
+                    Check out where we've been!
+                </h6>
+                <div>
+                    <a href="/auth-redirect" class="purple darken-3 wave-effects wave-light btn">
+                        Connect with Instagram
+                        <i class="material-icons right">input</i>
+                    </a>
+                </div>
+             </div>
+        </div>
+
+        {% if error %}
+        <div class="red lighten-1 red-text text-lighten-5 error-box">
+            <p>Oops, there was an error.</p>
+            <p class="error-message">{{error}}</p}>
+        </div>
+        {% endif %}
+        <div class="legal center-align">
+            <div class="credits">No personal information is stored by this website. Icons made by <a href="http://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>.</div>
+         </div>
     </div>
 </body>

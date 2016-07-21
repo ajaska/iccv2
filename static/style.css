@@ -1,0 +1,38 @@
+html, body, .content {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+
+    /*Ujustify-content: space-between;*/
+    /*font-family: 'Roboto', 'Noto Sans', sans-serif;*/
+    font-size: 13px;
+}
+
+.content-stuff {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pls-respond {
+    padding: 1em;
+}
+
+.login-box {
+    flex-grow: 1;
+    padding: 48px;
+}
+
+.error-box {
+    padding: 1em; 
+}
+
+.credits {
+    font-size: 10px;
+}

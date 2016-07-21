@@ -49,16 +49,25 @@ def index():
     )
     data = r.json().get("data")
     if data is None:
-        return "Error: " + r.text
+        return render_template(
+            'index.html',
+            error="Error: " + r.text
+        ), 500
     elif not data:
-        return "Error: found no ice cream images :(", 500
+        return render_template(
+            'index.html',
+            error="Error: found no ice cream images :("
+        ), 500
 
     data = filter(lambda media: media.get('location') is not None, data)
     data = filter(lambda media: media.get('type') == 'image', data)
     data = map(select_properties, data)
     data = list(data)
     if not data:
-        return "Error: no ice cream :(", 404
+        return render_template(
+            'index.html',
+            error="There is no ice cream :("
+        ), 404
     return render_template(
         'map.html',
         gmaps_api_key=config['Google Maps']['ApiKey'],
